@@ -10,7 +10,6 @@ var rowNb = 3;
 var columnNb = 3;
 var cw = rowNb*cellSize;
 var ch = columnNb*cellSize;
-
 var players = ['A','B'];
 var moves = [];
 var gameFinished = false;
@@ -24,8 +23,8 @@ var context = canvas.getContext('2d');
 canvas.addEventListener("click", getCursorPosition, false);
 
 
-
-
+// Start a new game
+gameInit();
 
 
 // Get mouse position on the board
@@ -60,25 +59,33 @@ function getCursorPosition(e) {
 	  	else if (moves.length == rowNb*columnNb) {
   			gameEnd('draw');
 	  	}	
-
     }
-
 }
 
-gameInit();
-
-
+// Initialize the game
 function gameInit() {
+	moves = [];
+	gameFinished = false;
+	players = ['A','B'];
 	drawBoard();
 	playerMsg();
 }
 
+// Undo the last move
+function undoMove() {
+	moves.pop();
+	players.reverse();
+	playerMsg();
+	drawBoard();
+}
+
+// Show player's turn
 function playerMsg() {
 	document.getElementById('outcome').innerHTML='Player '+players[0]+' your turn';
 }
 
+// Show the game outcome
 function gameEnd(outcome) {
-
 	if (outcome == 'win') {
 		gameFinished = true;
 		document.getElementById('outcome').innerHTML='Winner: Player '+players[0];
@@ -86,7 +93,6 @@ function gameEnd(outcome) {
 	else {
 		document.getElementById('outcome').innerHTML='Draw';		
 	}
-
 }
 
 // Check if a cell on the board is empty
@@ -107,6 +113,8 @@ function checkMatches() {
 	    	var ml2 = getMove(x+2, y);  	
 	    	var md1 = getMove(x+1, y+1);
 	    	var md2 = getMove(x+2, y+2);
+			var mdm1 = getMove(x-1, y-1);
+	    	var mdm2 = getMove(x-2, y-2);	    	
 	    	var mr1 = getMove(x, y+1);
 	    	var mr2 = getMove(x, y+2);  	   
 	    	if (m0.player === ml1.player && m0.player === ml2.player && m0 !== false && ml1 !== false && ml2 !== false)
@@ -114,7 +122,9 @@ function checkMatches() {
 	    	if (m0.player === md1.player && m0.player === md2.player && m0 !== false && md1 !== false && md2 !== false)
 	    		return true;
 	    	if (m0.player === mr1.player && m0.player === mr2.player && m0 !== false && mr1 !== false && mr2 !== false)
-	    		return true;  		 	  		    	
+	    		return true;  
+	    	if (m0.player === mdm1.player && m0.player === mdm2.player && m0 !== false && mdm1 !== false && mdm2 !== false)
+	    		return true;  	    				 	  		    	
 	    }	
 	 }
 	 return false;
@@ -139,7 +149,6 @@ function drawBoard(){
 	    	drawRect(x, y)    	
 	    }	
 	 }
-
 	 // Draw the moves on the board
     for (var i = 0; i < moves.length; i++) {
     	drawMove(moves[i]);	    	
