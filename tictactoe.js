@@ -49,7 +49,7 @@ function getCursorPosition(e) {
     columnSelection = Math.floor(y/cellSize);
     if(checkCellEmpty(rowSelection,columnSelection) && (!gameFinished)) {
 	    moves.push(new move(rowSelection, columnSelection, players[1]));
-	    players.reverse();
+	    
 	    playerMsg();
 	  	drawBoard();
 
@@ -59,6 +59,9 @@ function getCursorPosition(e) {
 	  	else if (moves.length == rowNb*columnNb) {
   			gameEnd('draw');
 	  	}	
+	  	else {
+			players.reverse();	  		
+	  	}
     }
 }
 
