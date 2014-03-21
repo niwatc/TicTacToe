@@ -11,7 +11,7 @@ var columnNb = 3;
 var cw = rowNb*cellSize;
 var ch = columnNb*cellSize;
 
-var player = 'A';
+var players = ['A','B'];
 var moves = [];
 
 var canvas = document.getElementById('canvas');
@@ -27,7 +27,7 @@ canvas.addEventListener("click", getCursorPosition, false);
 drawBoard();
 
 
-
+// Get mouse position on the board
 function getCursorPosition(e) {
     var x;
     var y;
@@ -47,18 +47,26 @@ function getCursorPosition(e) {
 
     rowSelection = Math.floor(x/cellSize);
     columnSelection = Math.floor(y/cellSize);
-    console.log(rowSelection,columnSelection);
+    if(checkCellEmpty(rowSelection,columnSelection)) {
+	    moves.push(new move(rowSelection, columnSelection, players[1]));
+	    players.reverse();
+	  	drawBoard();	
+    }
 
-    var move1 = new move(rowSelection, columnSelection, player);
-    drawMove(move1);
-
-    moves.push(move1);
-
-    // moves.push(new move(rowSelection, columnSelection, player));
-  
+    // var move1 = new move(rowSelection, columnSelection, player);
+    //drawMove(move1);
+    //moves.push(move1);
+  	
 }
 
-
+// Check if a cell on the board is empty
+function checkCellEmpty(row,column) {
+    for (var i = 0; i < moves.length; i++) {
+    	if (moves[i].row === row && moves[i].column === column )
+    		return false;   	
+    }
+    return true;
+}
 
 
 // Draw the board
@@ -71,12 +79,10 @@ function drawBoard(){
 	    }	
 	 }
 
-/*
-	 // Draw the pieces on the board
+	 // Draw the moves on the board
     for (var i = 0; i < moves.length; i++) {
     	drawMove(moves[i]);	    	
     }
-*/
 
 }
 
@@ -87,7 +93,7 @@ function drawRect(x, y) {
 	context.rect(x*cellSize, y*cellSize, x+cellSize, y+cellSize);
 	context.fillStyle = 'lightgrey';
 	context.fill();
-	context.strokeStyle = '#003300';
+	context.strokeStyle = '#000';
 	context.stroke();	
 }
 
@@ -102,11 +108,14 @@ function move(row, column, player) {
 
 // Draw the move on the board
 function drawMove(move) {
-	var padding = 20;
+	var padding = 10; // space between the circle and the cells border
 	var radius = cellSize/2-padding;
 	context.beginPath();
 	context.arc( (move.row+0.5)*cellSize, (move.column+0.5) * cellSize, radius, 0, 2 * Math.PI, false);
-	context.fillStyle = "#FF0000"
+	if (move.player == 'A')
+		context.fillStyle = "green";
+	else 
+		context.fillStyle = "orange";
 	context.fill();
 	context.lineWidth = 2;
 	context.stroke();   
