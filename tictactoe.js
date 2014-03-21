@@ -13,6 +13,7 @@ var ch = columnNb*cellSize;
 
 var players = ['A','B'];
 var moves = [];
+var gameFinished = false;
 
 var canvas = document.getElementById('canvas');
 // Set the canvas height and width
@@ -24,7 +25,7 @@ canvas.addEventListener("click", getCursorPosition, false);
 
 
 
-drawBoard();
+
 
 
 // Get mouse position on the board
@@ -47,16 +48,45 @@ function getCursorPosition(e) {
 
     rowSelection = Math.floor(x/cellSize);
     columnSelection = Math.floor(y/cellSize);
-    if(checkCellEmpty(rowSelection,columnSelection)) {
+    if(checkCellEmpty(rowSelection,columnSelection) && (!gameFinished)) {
 	    moves.push(new move(rowSelection, columnSelection, players[1]));
 	    players.reverse();
-	  	drawBoard();	
+	    playerMsg();
+	  	drawBoard();
+
+	  	if(checkMatches()) {
+	  		gameEnd('win');
+	  	}
+	  	else if (moves.length == rowNb*columnNb) {
+  			gameEnd('draw');
+	  	}	
+
     }
 
-    // var move1 = new move(rowSelection, columnSelection, player);
-    //drawMove(move1);
-    //moves.push(move1);
-  	
+}
+
+gameInit();
+
+
+function gameInit() {
+	drawBoard();
+	playerMsg();
+}
+
+function playerMsg() {
+	document.getElementById('outcome').innerHTML='Player '+players[0]+' your turn';
+}
+
+function gameEnd(outcome) {
+
+	if (outcome == 'win') {
+		gameFinished = true;
+		document.getElementById('outcome').innerHTML='Winner: Player '+players[0];
+	}
+	else {
+		document.getElementById('outcome').innerHTML='Draw';		
+	}
+
 }
 
 // Check if a cell on the board is empty
@@ -68,6 +98,37 @@ function checkCellEmpty(row,column) {
     return true;
 }
 
+// Check 3 matches
+function checkMatches() {
+	for (var y = 0; y <= columnNb; y++) {
+	    for (var x = 0; x <= rowNb; x++) {
+	    	var m0 = getMove(x,y);
+	    	var ml1 = getMove(x+1, y);
+	    	var ml2 = getMove(x+2, y);  	
+	    	var md1 = getMove(x+1, y+1);
+	    	var md2 = getMove(x+2, y+2);
+	    	var mr1 = getMove(x, y+1);
+	    	var mr2 = getMove(x, y+2);  	   
+	    	if (m0.player === ml1.player && m0.player === ml2.player && m0 !== false && ml1 !== false && ml2 !== false)
+	    		return true;
+	    	if (m0.player === md1.player && m0.player === md2.player && m0 !== false && md1 !== false && md2 !== false)
+	    		return true;
+	    	if (m0.player === mr1.player && m0.player === mr2.player && m0 !== false && mr1 !== false && mr2 !== false)
+	    		return true;  		 	  		    	
+	    }	
+	 }
+	 return false;
+}    
+
+// Get the move objectreturn piece object
+function getMove(row,column) {
+    for (var i = 0; i < moves.length; i++) {
+    	var m = moves[i]; 
+    	if( m.row == row && m.column == column)
+    		return m; 
+    }
+    return false;
+}
 
 // Draw the board
 function drawBoard(){	
@@ -98,7 +159,7 @@ function drawRect(x, y) {
 }
 
 
-
+// Move class
 function move(row, column, player) {
     this.row = row;
     this.column = column;
